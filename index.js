@@ -74,13 +74,30 @@ async function run(){
           const result = await userCollection.updateOne(filter, updateDoc);
           res.send(result);
         })
-
+        // post image 
         app.post('/doctors', async(req, res) => {
-          console.log('body', req.body);
-          console.log('email', req.files);
-          res.send({success: true})
+          const name = req.body.name;
+          const email = req.body.email;
+          const pic = req.files.image;
+          const picData = pic.data;
+          const encodedPic = picData.toString('base64');
+          const imageBuffer = Buffer.from(encodedPic, 'base64');
+          const doctor = {
+            name,
+            email,
+            image: imageBuffer
+          }
+          const result = await doctorsCollection.insertOne(doctor);
+          console.log('files', req.files);
+          res.send(result);
         })
-
+        // get image
+        app.get('/doctors', async(req, res) => {
+          console.log('doctor');
+          const result = await doctorsCollection.find({}).toArray();
+          res.send(result);
+          
+        })
 
         app.post('/create-payment-intent', async(req, res) => {
           const paymentInfo = req.body;
